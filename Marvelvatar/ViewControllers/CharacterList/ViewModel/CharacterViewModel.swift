@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import RxSwift
 
 protocol CharacterViewModelDelegate: class {
     func didFinishFetchWithSuccess()
@@ -44,6 +45,8 @@ class CharacterViewModel: NSObject {
     typealias success = ((_ characterModel: CharacterModel?)->())?
     typealias failure = ((_ error: Error)->())?
     
+    let searchBarText = Variable<String>("")
+    
     //Fetches the characters from the Marvel API
     func loadCharacters(offSet: Int? = 0, nameStarts: String? = nil, success: success = nil, failure: failure = nil) {
         
@@ -72,32 +75,7 @@ class CharacterViewModel: NSObject {
                 failureCompletion(error)
             }
         }
-       /*
-        APIManager.sharedManager.request(url: Routes.characters(limit: resultsLimit, offset: offSet, nameStartsWith: nameStarts).createURL(), success: { [weak self](response) in
-            guard let characterModel = CharacterModel(dictionary: response), let results = characterModel.data?.results  else{return}
-            
-            if self!.isBeingFiltered{
-                
-                self?.parseSearchData(results: results)
-            }else{
-                self?.parseData(characterModel: characterModel, results: results)
-            }
-            DispatchQueue.main.async {
-                if let delegate = self?.delegate{
-                delegate.didFinishFetchWithSuccess()
-                }
-            }
-            guard let successCompleteion = success else {return}
-                successCompleteion(self?.characterModel)
-        }) {[weak self](error) in
-            DispatchQueue.main.async {
-                if let delegate = self?.delegate{
-                    delegate.didFinishFetchingWithError(error: error)
-                }
-                guard let failureCompletion = failure else {return}
-                failureCompletion(error)
-            }
-        }*/
+       
     }
     //loads more data when user scrolls down
     func loadMore() {
@@ -131,7 +109,6 @@ class CharacterViewModel: NSObject {
             //if yes set the isFavorite to the given value
             if filteredFromOriginal?.count ?? 0 > 0 {
                 filteredFromOriginal?.first?.isFavorite = isSelected
-                
             } else {
                 //if user presses the same button again, then remove the id
                 if let index = hasFavoritedCharacter.index(of: favorite) {

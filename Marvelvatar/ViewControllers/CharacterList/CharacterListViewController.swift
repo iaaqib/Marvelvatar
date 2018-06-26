@@ -41,7 +41,7 @@ class CharacterListViewController: UIViewController {
             Utils.showAlert(title: "Connect to Internet", message: "Please Connect to internet and try again.", sender: weakSelf)
         }
         
-        
+        searchBarField.rx.text.orEmpty.bind(to: characterViewModel.searchBarText).disposed(by: disposeBag)
         setUpTableViewFooter()
     }
     
@@ -86,6 +86,7 @@ class CharacterListViewController: UIViewController {
                 if query.isEmpty {
                     return
                 }
+                
                  characterViewModel.searchName(text: query)
                 
             }
