@@ -42,6 +42,18 @@ class CharacterListViewController: UIViewController {
         }
         
         searchBarField.rx.text.orEmpty.bind(to: characterViewModel.searchBarText).disposed(by: disposeBag)
+        
+        characterViewModel.results!.asObservable().bind(to: tableView
+                .rx //2
+                .items(cellIdentifier: CharacterTableViewCell.identifier,
+                       cellType: CharacterTableViewCell.self)) { // 3
+                        row, result, cell in
+                        let characterData = self.characterViewModel.getDataModel(index: row)
+                    cell.characterModel = (characterData, row)
+                    cell.favoriteButton.tag = row
+                        cell.favoriteButton.addTarget(self, action: #selector(self.didPressFavoriteAction), for: .touchUpInside)
+            }
+            .disposed(by: disposeBag)
         setUpTableViewFooter()
     }
     
@@ -79,29 +91,28 @@ class CharacterListViewController: UIViewController {
         tableView.tableFooterView?.isHidden = true
     }
     func bindSearchBar() {
-        searchBarField.rx.text.orEmpty
-            .throttle(0.5, scheduler: MainScheduler.instance)
-            .distinctUntilChanged()
-            .flatMapLatest { query -> Observable<CharacterModel> in
-                if query.isEmpty {
-                    return
-                }
-                
-                 characterViewModel.searchName(text: query)
-                
-            }
-            .observeOn(MainScheduler.instance)
-            .asObservable().subscribe( onError: { (error) in
-                
-            }, onCompleted: {
-                self.tableView.reloadData()
-            })
-            .disposed(by: disposeBag)
+//        searchBarField.rx.text.orEmpty
+//            .throttle(0.5, scheduler: MainScheduler.instance)
+//            .distinctUntilChanged()
+//            .flatMapLatest { query -> Observable<CharacterModel> in
+//                if query.isEmpty {
+//                    return
+//                }
+//
+//                 characterViewModel.searchName(text: query)
+//
+//            }
+//            .observeOn(MainScheduler.instance)
+//            .asObservable().subscribe( onError: { (error) in
+//                
+//            }, onCompleted: {
+//                self.tableView.reloadData()
+//            })
+//            .disposed(by: disposeBag)
 
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        ImageCache.clearCache()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -112,45 +123,6 @@ class CharacterListViewController: UIViewController {
             destination.characterModel = selectedCharacter
         }
     }
-}
-
-extension CharacterListViewController: UITableViewDataSource, UITableViewDelegate {
-    
-    //MARK: - TableViewDataSource
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: CharacterTableViewCell.identifier, for: indexPath) as! CharacterTableViewCell
-        
-        let characterData = characterViewModel.getDataModel(index: indexPath.row)
-        cell.characterModel = (characterData, indexPath.row)
-        cell.favoriteButton.tag = indexPath.row
-        cell.favoriteButton.addTarget(self, action: #selector(didPressFavoriteAction), for: .touchUpInside)
-        return cell
-        
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return characterViewModel.dataCount()
-    }
-    
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let results = characterViewModel.results else { return }
-        let lastItem = results.count - 1
-        if indexPath.row == lastItem{
-            characterViewModel.loadMore()
-            showBottomLoader()
-        }else{
-            hideBottomLoader()
-        }
-    }
-    
-    //MARK:- TableViewDelegate
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedCell = tableView.cellForRow(at: indexPath) as? CharacterTableViewCell
-        
-        performSegue(withIdentifier: "detail", sender: indexPath.row)
-    }
-    
-    
 }
 extension CharacterListViewController: CharacterViewModelDelegate {
     
@@ -196,11 +168,9 @@ extension CharacterListViewController: UINavigationControllerDelegate {
         case .push:
             transition.originFrame = selectedCell!.superview!.convert(selectedCell!.frame, to: nil)
             transition.isPresenting = true
-            
             return transition
         default:
             transition.isPresenting = false
-            
             return transition
         }
     }

@@ -26,10 +26,10 @@ class CharacterViewModel: NSObject {
     var characterModel: CharacterModel? = nil
     
     //to keep things clean in the controller, created this to avoid a lot of '.' to access the results from inside of characterModel
-    var results: [Results]? = nil
+    var results: Variable<[Results]>? = Variable([])
     
     //for keeping track of searched characters
-    var searchResults: [Results]? = nil
+    var searchResults: Variable<[Results]>? = Variable([])
     
     //requested limit
     let resultsLimit = 20
@@ -103,9 +103,9 @@ class CharacterViewModel: NSObject {
         
         if isBeingFiltered {
             //Get the id
-            let favorite = searchResults?[index].id ?? 0
+            let favorite = searchResults?.value[index].id ?? 0
             //Check if the id is present in the original results
-            let filteredFromOriginal = results?.filter{$0.id! == favorite}
+            let filteredFromOriginal = results?.value.filter{$0.id! == favorite}
             //if yes set the isFavorite to the given value
             if filteredFromOriginal?.count ?? 0 > 0 {
                 filteredFromOriginal?.first?.isFavorite = isSelected
@@ -119,13 +119,12 @@ class CharacterViewModel: NSObject {
             }
         } else {
             //if user is not searching, just set the passed in value to isFavorite
-            self.results?[index].isFavorite = isSelected
+            self.results?.value[index].isFavorite = isSelected
         }
     }
     
     //Search Character by Name
     func searchName(text:String) {
-        
         isBeingFiltered = text.count == 0 ? false : true
         if !isBeingFiltered{
         delegate?.didFinishFetchWithSuccess()
@@ -133,13 +132,13 @@ class CharacterViewModel: NSObject {
         }
         guard let results = characterModel?.data?.results else {return}
         //Search if the character name is present locally
-        self.searchResults = results.filter({ (responseObject) -> Bool in
+        self.searchResults?.value = results.filter({ (responseObject) -> Bool in
             guard let tmp: NSString = responseObject.name as NSString? else {return false}
             let range = tmp.range(of: text, options: NSString.CompareOptions.caseInsensitive)
             return range.location != NSNotFound
         })
         // if not, load the character from api by name
-        if self.searchResults?.count == 0 {
+        if self.searchResults?.value.count == 0 {
             delegate?.searching()
             loadCharacters(nameStarts: text)
         } else {
@@ -150,20 +149,20 @@ class CharacterViewModel: NSObject {
     //Returns the data count of the either Result or Search Results array
     func dataCount() -> Int {
         if isBeingFiltered{
-            return searchResults?.count  ?? 0
+            return searchResults?.value.count  ?? 0
         }else{
-            return results?.count ?? 0
+            return results?.value.count ?? 0
         }
     }
     
     //Returns the data model from either Result or Search Results array
     func getDataModel(index: Int) -> Results? {
         if isBeingFiltered{
-            var search = [searchResults![index]]
+            var search = [searchResults!.value[index]]
             filterIdsToApplyFavorite(results: &search)
             return search.first!
-        }else{
-            return results?[index]
+        } else {
+            return results?.value[index]
         }
 
     }
@@ -175,20 +174,20 @@ class CharacterViewModel: NSObject {
         if let charModel = self.characterModel, let oldResults = charModel.data?.results{
             let resultsArray = oldResults + results
             self.characterModel?.data?.results = resultsArray
-            self.results = self.characterModel?.data?.results
-            filterIdsToApplyFavorite(results: &self.results!)
+            self.results?.value = self.characterModel!.data!.results!
+            filterIdsToApplyFavorite(results: &self.results!.value)
             
         }else{//if data is being loaded for the first time
             self.characterModel = characterModel
-            self.results = self.characterModel?.data?.results
+            self.results?.value = self.characterModel!.data!.results!
             self.characterModel?.data?.offset = self.resultsLimit
         }
     }
     
     //Parse search results data
     private func parseSearchData(results: [Results]) {
-        self.searchResults = results
-        self.filterIdsToApplyFavorite(results: &self.searchResults!)
+        self.searchResults?.value = results
+        self.filterIdsToApplyFavorite(results: &self.searchResults!.value)
     }
     
     //check if user has favorited any searched result, if yes, make the isFavorite variable true in the result.

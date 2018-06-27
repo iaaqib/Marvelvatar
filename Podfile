@@ -12,4 +12,6 @@ target 'Marvelvatar' do
  pod 'ObjectMapper'
  pod 'RxSwift'
  pod 'RxCocoa'
+pod 'RxAlamofire+ObjectMapper'
+
 end

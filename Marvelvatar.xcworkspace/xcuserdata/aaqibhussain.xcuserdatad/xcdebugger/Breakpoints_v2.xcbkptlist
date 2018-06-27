@@ -10,13 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Marvelvatar/ViewControllers/CharacterList/ViewModel/CharacterViewModel.swift"
-            timestampString = "551556771.913431"
+            timestampString = "551800160.612157"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "221"
-            endingLineNumber = "221"
-            landmarkName = "filterIdsToApplyFavorite(results:)"
-            landmarkType = "7">
+            startingLineNumber = "202"
+            endingLineNumber = "202">
             <Locations>
                <Location
                   shouldBeEnabled = "No"

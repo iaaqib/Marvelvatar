@@ -1,0 +1,6 @@
+framework module RxAlamofire_ObjectMapper {
+  umbrella header "RxAlamofire+ObjectMapper-umbrella.h"
+
+  export *
+  module * { export * }
+}
