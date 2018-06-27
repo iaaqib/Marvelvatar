@@ -43,10 +43,9 @@ class CharacterListViewController: UIViewController {
         
         searchBarField.rx.text.orEmpty.bind(to: characterViewModel.searchBarText).disposed(by: disposeBag)
         
-        tableView.rx.setDelegate(self).disposed(by: disposeBag)
-
         configureCellForRow()
         configueCellTap()
+        configureWillDisplayCell()
         setUpTableViewFooter()
     }
     
@@ -112,7 +111,20 @@ class CharacterListViewController: UIViewController {
             })
             .disposed(by: disposeBag)
     }
-    
+    func configureWillDisplayCell() {
+        tableView.rx
+            .willDisplayCell
+            .subscribe(onNext: { cell, indexPath in
+                guard let results = self.characterViewModel.results else { return }
+                let lastItem = results.value.count - 1
+                if indexPath.row == lastItem {
+                    self.characterViewModel.loadMore()
+                    self.showBottomLoader()
+                } else {
+                    self.hideBottomLoader()
+                }
+            }).disposed(by: disposeBag)
+    }
     
     func bindSearchBar() {
 //        searchBarField.rx.text.orEmpty
@@ -179,19 +191,6 @@ extension CharacterListViewController: UISearchBarDelegate {
         
     }
     
-}
-extension CharacterListViewController: UITableViewDelegate {
-   
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let results = characterViewModel.results else { return }
-        let lastItem = results.value.count - 1
-        if indexPath.row == lastItem {
-            characterViewModel.loadMore()
-            showBottomLoader()
-        } else {
-            hideBottomLoader()
-        }
-    }
 }
 extension CharacterListViewController: UINavigationControllerDelegate {
     

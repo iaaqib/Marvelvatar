@@ -153,8 +153,8 @@ class CharacterViewModel: NSObject {
     func getDataModel(index: Int) -> Results? {
         if isBeingFiltered{
             var search = [searchResults!.value[index]]
-            filterIdsToApplyFavorite(results: &search)
-            return search.first!
+            let searched = filterIdsToApplyFavorite(results: &search)
+            return searched.first!
         } else {
             return results?.value[index]
         }

@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Marvelvatar/ViewControllers/CharacterList/ViewModel/CharacterViewModel.swift"
-            timestampString = "551819219.062251"
+            timestampString = "551821308.034405"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "196"
@@ -66,11 +66,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Marvelvatar/ViewControllers/CharacterList/CharacterListViewController.swift"
-            timestampString = "551819219.063369"
+            timestampString = "551821308.034858"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "146"
-            endingLineNumber = "146"
+            startingLineNumber = "157"
+            endingLineNumber = "157"
             landmarkName = "prepare(for:sender:)"
             landmarkType = "7">
          </BreakpointContent>
