@@ -43,17 +43,10 @@ class CharacterListViewController: UIViewController {
         
         searchBarField.rx.text.orEmpty.bind(to: characterViewModel.searchBarText).disposed(by: disposeBag)
         
-        characterViewModel.results!.asObservable().bind(to: tableView
-                .rx //2
-                .items(cellIdentifier: CharacterTableViewCell.identifier,
-                       cellType: CharacterTableViewCell.self)) { // 3
-                        row, result, cell in
-                        let characterData = self.characterViewModel.getDataModel(index: row)
-                    cell.characterModel = (characterData, row)
-                    cell.favoriteButton.tag = row
-                        cell.favoriteButton.addTarget(self, action: #selector(self.didPressFavoriteAction), for: .touchUpInside)
-            }
-            .disposed(by: disposeBag)
+        tableView.rx.setDelegate(self).disposed(by: disposeBag)
+
+        configureCellForRow()
+        configueCellTap()
         setUpTableViewFooter()
     }
     
@@ -90,6 +83,37 @@ class CharacterListViewController: UIViewController {
         bottomLoader.activitiIndictor.stopAnimating()
         tableView.tableFooterView?.isHidden = true
     }
+    func configureCellForRow() {
+        characterViewModel.results!.asObservable().bind(to: tableView
+            .rx //2
+            .items(cellIdentifier: CharacterTableViewCell.identifier,
+                   cellType: CharacterTableViewCell.self)) { 
+                    row, result, cell in
+                    let characterData = self.characterViewModel.getDataModel(index: row)
+                    cell.characterModel = (characterData, row)
+                    cell.favoriteButton.tag = row
+                    cell.favoriteButton.addTarget(self, action: #selector(self.didPressFavoriteAction), for: .touchUpInside)
+            }
+            .disposed(by: disposeBag)
+        
+    }
+    func configueCellTap() {
+        tableView
+            .rx
+            .modelSelected(Results.self)
+            .subscribe(onNext: { [weak self]
+                selectedCharacter in
+                
+               if let indexPath = self?.tableView.indexPathForSelectedRow {
+                let cell = self?.tableView.cellForRow(at: indexPath) as! CharacterTableViewCell
+                self?.selectedCell = cell
+                self?.performSegue(withIdentifier: "detail", sender: selectedCharacter)
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    
     func bindSearchBar() {
 //        searchBarField.rx.text.orEmpty
 //            .throttle(0.5, scheduler: MainScheduler.instance)
@@ -117,9 +141,8 @@ class CharacterListViewController: UIViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "detail" {
-            guard let index = sender as? Int else {return}
+            guard let selectedCharacter = sender as? Results else {return}
             let destination = segue.destination as! CharacterDetailViewController
-            guard let selectedCharacter = characterViewModel.getDataModel(index: index) else {return}
             destination.characterModel = selectedCharacter
         }
     }
@@ -157,7 +180,19 @@ extension CharacterListViewController: UISearchBarDelegate {
     }
     
 }
-
+extension CharacterListViewController: UITableViewDelegate {
+   
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard let results = characterViewModel.results else { return }
+        let lastItem = results.value.count - 1
+        if indexPath.row == lastItem {
+            characterViewModel.loadMore()
+            showBottomLoader()
+        } else {
+            hideBottomLoader()
+        }
+    }
+}
 extension CharacterListViewController: UINavigationControllerDelegate {
     
     //MARK: Navigation Controller Delegate

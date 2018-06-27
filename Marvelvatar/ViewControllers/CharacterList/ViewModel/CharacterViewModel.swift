@@ -8,6 +8,7 @@
 
 import Foundation
 import RxSwift
+import RxCocoa
 
 protocol CharacterViewModelDelegate: class {
     func didFinishFetchWithSuccess()
@@ -21,31 +22,24 @@ class CharacterViewModel: NSObject {
     
     //Delegate for callbacks
     weak var delegate: CharacterViewModelDelegate? = nil
-    
     //holds all the parsed data coming from api
     var characterModel: CharacterModel? = nil
-    
     //to keep things clean in the controller, created this to avoid a lot of '.' to access the results from inside of characterModel
-    var results: Variable<[Results]>? = Variable([])
-    
+    var results: BehaviorRelay<[Results]>? = BehaviorRelay(value: [])
     //for keeping track of searched characters
-    var searchResults: Variable<[Results]>? = Variable([])
-    
+    var searchResults: BehaviorRelay<[Results]>? = BehaviorRelay(value: [])
     //requested limit
     let resultsLimit = 20
-    
     //if user is searching something
     var isBeingFiltered = false
-    
     /**
      this on is the tricky part, this variable holds the ids of the characters which are fetched from the api using the search bar and those records which are not already in the results array, to keep track of if the user has favorited that particular search result it should also be shown as their favorite when loaded from the main data by scrolling down or even when the user has cleared the search bar and searched that character again.
      **/
     lazy var hasFavoritedCharacter: [Int] = []
-    
     typealias success = ((_ characterModel: CharacterModel?)->())?
     typealias failure = ((_ error: Error)->())?
+    let searchBarText = BehaviorRelay<String>(value: "")
     
-    let searchBarText = Variable<String>("")
     
     //Fetches the characters from the Marvel API
     func loadCharacters(offSet: Int? = 0, nameStarts: String? = nil, success: success = nil, failure: failure = nil) {
@@ -53,19 +47,19 @@ class CharacterViewModel: NSObject {
         APIManager.sharedInstance.request(urlConvertible: Routes.characters(limit: resultsLimit, offset: offSet, nameStartsWith: nameStarts), success: {[weak self] (characterModel: CharacterModel) in
             guard let weakSelf = self, let results = characterModel.data?.results else { return }
             if weakSelf.isBeingFiltered {
-                
                 weakSelf.parseSearchData(results: results)
             } else {
                 weakSelf.parseData(characterModel: characterModel, results: results)
             }
             DispatchQueue.main.async {
-                if let delegate = weakSelf.delegate{
+                if let delegate = weakSelf.delegate {
                     delegate.didFinishFetchWithSuccess()
                 }
             }
-            guard let successCompleteion = success else {return}
+            guard let successCompleteion = success else { return }
             successCompleteion(weakSelf.characterModel)
         }) { [weak self] (error) in
+          
             DispatchQueue.main.async {
                 guard let weakSelf = self else { return }
                 if let delegate = weakSelf.delegate{
@@ -132,11 +126,11 @@ class CharacterViewModel: NSObject {
         }
         guard let results = characterModel?.data?.results else {return}
         //Search if the character name is present locally
-        self.searchResults?.value = results.filter({ (responseObject) -> Bool in
+        self.searchResults?.accept(results.filter({ (responseObject) -> Bool in
             guard let tmp: NSString = responseObject.name as NSString? else {return false}
             let range = tmp.range(of: text, options: NSString.CompareOptions.caseInsensitive)
             return range.location != NSNotFound
-        })
+        }))
         // if not, load the character from api by name
         if self.searchResults?.value.count == 0 {
             delegate?.searching()
@@ -171,31 +165,31 @@ class CharacterViewModel: NSObject {
     private func parseData(characterModel: CharacterModel, results: [Results]) {
         
         //if data is being loaded again, then append the new array into the old one.
-        if let charModel = self.characterModel, let oldResults = charModel.data?.results{
-            let resultsArray = oldResults + results
+        if let charModel = self.characterModel, let oldResults = charModel.data?.results {
+            var resultsArray = oldResults + results
             self.characterModel?.data?.results = resultsArray
-            self.results?.value = self.characterModel!.data!.results!
-            filterIdsToApplyFavorite(results: &self.results!.value)
-            
-        }else{//if data is being loaded for the first time
+         //   self.results?.accept(self.characterModel!.data!.results!)
+          self.results?.accept(filterIdsToApplyFavorite(results: &resultsArray))
+        } else {//if data is being loaded for the first time
             self.characterModel = characterModel
-            self.results?.value = self.characterModel!.data!.results!
+            self.results?.accept(self.characterModel!.data!.results!)
             self.characterModel?.data?.offset = self.resultsLimit
         }
     }
     
     //Parse search results data
     private func parseSearchData(results: [Results]) {
-        self.searchResults?.value = results
-        self.filterIdsToApplyFavorite(results: &self.searchResults!.value)
+        var results = results
+       self.searchResults?.accept(self.filterIdsToApplyFavorite(results: &results))
     }
     
     //check if user has favorited any searched result, if yes, make the isFavorite variable true in the result.
-    private func filterIdsToApplyFavorite( results: inout [Results]) {
+    private func filterIdsToApplyFavorite( results: inout [Results]) -> [Results] {
         if hasFavoritedCharacter.count > 0 {
             hasFavoritedCharacter.forEach({ (id) in
                 results.filter{$0.id! == id}.first?.isFavorite = true
             })
         }
+        return results
     }
 }
