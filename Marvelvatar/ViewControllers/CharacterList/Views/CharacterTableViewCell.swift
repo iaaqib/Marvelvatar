@@ -13,7 +13,6 @@ class CharacterTableViewCell: UITableViewCell {
     
     @IBOutlet weak var characterImage: UIImageView!
     @IBOutlet weak var characterName: UILabel!
-    @IBOutlet weak var favoriteButton: UIButton!
     
     static let identifier = "characterCell"
     
@@ -23,9 +22,7 @@ class CharacterTableViewCell: UITableViewCell {
             guard let result = model.result else {return}
         
             characterName.text = "\(model.row + 1): \(String(describing: result.name ?? ""))"
-            characterImage.kf.setImage(with: result.thumbnail?.imageUrl, placeholder: #imageLiteral(resourceName: "marvel-place"))
-            favoriteButton.isSelected = result.isFavorite ? true : false
-            
+            characterImage.kf.setImage(with: result.thumbnail?.imageUrl, placeholder: #imageLiteral(resourceName: "marvel-place"))            
         }
     }
     

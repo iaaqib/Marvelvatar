@@ -25,9 +25,6 @@
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="string" keyPath="accessibilityIdentifier" value="Search"/>
                                 </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <outlet property="delegate" destination="BYZ-38-t0r" id="ep3-i2-0q4"/>
-                                </connections>
                             </searchBar>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="iJA-wy-Lth">
                                 <rect key="frame" x="0.0" y="56" width="375" height="547"/>
@@ -62,23 +59,11 @@
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nM5-tt-4Wb">
-                                                            <rect key="frame" x="197" y="8" width="35" height="35"/>
-                                                            <accessibility key="accessibilityConfiguration" identifier="Favorite"/>
-                                                            <constraints>
-                                                                <constraint firstAttribute="width" constant="35" id="71B-g6-0jS"/>
-                                                                <constraint firstAttribute="height" constant="35" id="8QZ-G2-zW7"/>
-                                                            </constraints>
-                                                            <state key="normal" image="star-unfilled"/>
-                                                            <state key="selected" image="star-filled"/>
-                                                        </button>
                                                     </subviews>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <constraints>
                                                         <constraint firstAttribute="bottom" secondItem="gLV-wH-fl1" secondAttribute="bottom" constant="4.5" id="1Wi-Y4-FqJ"/>
                                                         <constraint firstItem="nuW-2m-7vp" firstAttribute="centerX" secondItem="Hw0-Wn-Ny8" secondAttribute="centerX" id="HX5-Nd-7TQ"/>
-                                                        <constraint firstItem="nM5-tt-4Wb" firstAttribute="leading" secondItem="nuW-2m-7vp" secondAttribute="trailing" constant="-25" id="Pc5-h3-yfK"/>
-                                                        <constraint firstItem="nuW-2m-7vp" firstAttribute="top" secondItem="nM5-tt-4Wb" secondAttribute="bottom" constant="-33" id="YgO-tZ-PbK"/>
                                                         <constraint firstItem="nuW-2m-7vp" firstAttribute="top" secondItem="Hw0-Wn-Ny8" secondAttribute="top" constant="10" id="Zd3-8d-yNf"/>
                                                         <constraint firstItem="gLV-wH-fl1" firstAttribute="leading" secondItem="Hw0-Wn-Ny8" secondAttribute="leading" constant="10" id="bXW-C1-xwG"/>
                                                         <constraint firstAttribute="trailing" secondItem="gLV-wH-fl1" secondAttribute="trailing" constant="10" id="de8-AV-N0b"/>
@@ -99,7 +84,6 @@
                                         <connections>
                                             <outlet property="characterImage" destination="nuW-2m-7vp" id="jKq-2M-gf8"/>
                                             <outlet property="characterName" destination="gLV-wH-fl1" id="iJT-32-3Bf"/>
-                                            <outlet property="favoriteButton" destination="nM5-tt-4Wb" id="I2t-tp-e0p"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -157,15 +141,6 @@
                                             <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
                                         </userDefinedRuntimeAttributes>
                                     </imageView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5WT-9B-w5l">
-                                        <rect key="frame" x="197" y="8" width="35" height="35"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="35" id="1ev-ro-aTQ"/>
-                                            <constraint firstAttribute="width" constant="35" id="B7y-mc-oqZ"/>
-                                        </constraints>
-                                        <state key="normal" image="star-unfilled"/>
-                                        <state key="selected" image="star-filled"/>
-                                    </button>
                                     <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3D Man" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jA9-ST-gng">
                                         <rect key="frame" x="10" y="110" width="335" height="35.5"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="24"/>
@@ -178,9 +153,7 @@
                                     <constraint firstAttribute="bottom" secondItem="jA9-ST-gng" secondAttribute="bottom" constant="4.5" id="3jg-tw-4na"/>
                                     <constraint firstAttribute="trailing" secondItem="jA9-ST-gng" secondAttribute="trailing" constant="10" id="9Qv-LX-0U8"/>
                                     <constraint firstItem="jA9-ST-gng" firstAttribute="leading" secondItem="5Nr-LN-lzM" secondAttribute="leading" constant="10" id="Bsg-O3-5kR"/>
-                                    <constraint firstItem="5WT-9B-w5l" firstAttribute="leading" secondItem="crC-64-d6H" secondAttribute="trailing" constant="-25" id="C3X-yo-INZ"/>
                                     <constraint firstItem="crC-64-d6H" firstAttribute="top" secondItem="5Nr-LN-lzM" secondAttribute="top" constant="10" id="XDL-9d-Rrm"/>
-                                    <constraint firstItem="crC-64-d6H" firstAttribute="top" secondItem="5WT-9B-w5l" secondAttribute="bottom" constant="-33" id="YTy-ve-AOt"/>
                                     <constraint firstItem="jA9-ST-gng" firstAttribute="top" secondItem="crC-64-d6H" secondAttribute="bottom" constant="10" id="gvy-rJ-DIc"/>
                                     <constraint firstItem="crC-64-d6H" firstAttribute="centerX" secondItem="5Nr-LN-lzM" secondAttribute="centerX" id="vBd-pp-2Rb"/>
                                     <constraint firstAttribute="height" constant="150" id="wfe-Kf-RYF"/>
@@ -222,7 +195,6 @@
                         <outlet property="characterDescription" destination="qO8-Yg-bvh" id="WBa-Tp-YHc"/>
                         <outlet property="characterImage" destination="crC-64-d6H" id="QeA-15-bm4"/>
                         <outlet property="characterName" destination="jA9-ST-gng" id="hao-ix-UBw"/>
-                        <outlet property="favoriteButton" destination="5WT-9B-w5l" id="SGZ-u2-stF"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hKh-bF-Kty" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -258,7 +230,5 @@
     </scenes>
     <resources>
         <image name="marvel-place" width="335" height="335"/>
-        <image name="star-filled" width="100" height="100"/>
-        <image name="star-unfilled" width="100" height="100"/>
     </resources>
 </document>

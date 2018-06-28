@@ -13,7 +13,6 @@ class CharacterDetailViewController: UIViewController {
     @IBOutlet weak var characterImage: UIImageView!
     @IBOutlet weak var characterName: UILabel!
     @IBOutlet weak var characterDescription: UITextView!
-    @IBOutlet weak var favoriteButton: UIButton!
     
     var characterModel: Results!
     
@@ -38,9 +37,7 @@ class CharacterDetailViewController: UIViewController {
         
         characterName.text = characterModel.name ?? ""
         var description = characterModel.description ?? ""
-        description = description == "" ? "NA" : description
-        favoriteButton.isSelected = characterModel.isFavorite
-        
+        description = description == "" ? "NA" : description        
         
         let descriptionAttributed = NSMutableAttributedString()
         descriptionAttributed.bold("Description: ").normal("\(description)\n")

@@ -64,13 +64,6 @@ class CharacterListViewController: UIViewController {
         tableView.keyboardDismissMode = .onDrag
     }
     
-    @IBAction func didPressFavoriteAction(_ sender: UIButton) {
-        let index = sender.tag
-        sender.isSelected = !sender.isSelected
-        
-        characterViewModel.favoritePressed(index: index, isSelected: sender.isSelected)
-    }
-    
     //Footter view activity loader show
     private func showBottomLoader() {
         bottomLoader.activitiIndictor.startAnimating()
@@ -83,15 +76,13 @@ class CharacterListViewController: UIViewController {
         tableView.tableFooterView?.isHidden = true
     }
     func configureCellForRow() {
-        characterViewModel.results!.asObservable().bind(to: tableView
+        characterViewModel.dataObservable.asObservable().bind(to: tableView
             .rx //2
             .items(cellIdentifier: CharacterTableViewCell.identifier,
-                   cellType: CharacterTableViewCell.self)) { 
+                   cellType: CharacterTableViewCell.self)) {
                     row, result, cell in
                     let characterData = self.characterViewModel.getDataModel(index: row)
                     cell.characterModel = (characterData, row)
-                    cell.favoriteButton.tag = row
-                    cell.favoriteButton.addTarget(self, action: #selector(self.didPressFavoriteAction), for: .touchUpInside)
             }
             .disposed(by: disposeBag)
         
@@ -103,10 +94,10 @@ class CharacterListViewController: UIViewController {
             .subscribe(onNext: { [weak self]
                 selectedCharacter in
                 
-               if let indexPath = self?.tableView.indexPathForSelectedRow {
-                let cell = self?.tableView.cellForRow(at: indexPath) as! CharacterTableViewCell
-                self?.selectedCell = cell
-                self?.performSegue(withIdentifier: "detail", sender: selectedCharacter)
+                if let indexPath = self?.tableView.indexPathForSelectedRow {
+                    let cell = self?.tableView.cellForRow(at: indexPath) as! CharacterTableViewCell
+                    self?.selectedCell = cell
+                    self?.performSegue(withIdentifier: "detail", sender: selectedCharacter)
                 }
             })
             .disposed(by: disposeBag)
@@ -115,8 +106,7 @@ class CharacterListViewController: UIViewController {
         tableView.rx
             .willDisplayCell
             .subscribe(onNext: { cell, indexPath in
-                guard let results = self.characterViewModel.results else { return }
-                let lastItem = results.value.count - 1
+                let lastItem = self.characterViewModel.results.value.count - 1
                 if indexPath.row == lastItem {
                     self.characterViewModel.loadMore()
                     self.showBottomLoader()
@@ -126,27 +116,6 @@ class CharacterListViewController: UIViewController {
             }).disposed(by: disposeBag)
     }
     
-    func bindSearchBar() {
-//        searchBarField.rx.text.orEmpty
-//            .throttle(0.5, scheduler: MainScheduler.instance)
-//            .distinctUntilChanged()
-//            .flatMapLatest { query -> Observable<CharacterModel> in
-//                if query.isEmpty {
-//                    return
-//                }
-//
-//                 characterViewModel.searchName(text: query)
-//
-//            }
-//            .observeOn(MainScheduler.instance)
-//            .asObservable().subscribe( onError: { (error) in
-//                
-//            }, onCompleted: {
-//                self.tableView.reloadData()
-//            })
-//            .disposed(by: disposeBag)
-
-    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
@@ -163,8 +132,6 @@ extension CharacterListViewController: CharacterViewModelDelegate {
     
     //MARK:- CarouselViewModel Delegate
     func didFinishFetchWithSuccess() {
-        
-        self.tableView.reloadData()
         hideBottomLoader()
         self.view.hideLoaderView()
     }
@@ -180,15 +147,6 @@ extension CharacterListViewController: CharacterViewModelDelegate {
     
     func nothingMoreToShow() {
         hideBottomLoader()
-    }
-    
-}
-extension CharacterListViewController: UISearchBarDelegate {
-    
-    //MARK:- SearchBar Delegate
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        characterViewModel.searchName(text: searchText)
-        
     }
     
 }

@@ -24,17 +24,6 @@ class APIManager {
         }, onError: { (error) in
             failure(error)
         }).disposed(by: disposeBag)
-      /*  Alamofire.request(urlConvertible).responseString { (response) in
-            switch response.result {
-            case .success(let value):
-                guard let map = Mapper<T>().map(JSONString: value) else { return }
-                success(map)
-            case .failure(let error):
-                failure(error)
-            }
-        }*/
-        
-        
     }
     
 }
